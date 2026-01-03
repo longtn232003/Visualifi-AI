@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/production/Dockerfile.production
+    container_name: visualifyai-app
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=visualifyai.com,www.visualifyai.com
+      - LETSENCRYPT_HOST=visualifyai.com,www.visualifyai.com
+      - LETSENCRYPT_EMAIL=admin@visualifyai.com
+    expose:
+      - '80'
+    networks:
+      - nginx-proxy
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    environment:
+      - DEFAULT_HOST=visualifyai.com
+    depends_on:
+      - app
+    networks:
+      - nginx-proxy
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - DEFAULT_EMAIL=admin@visualifyai.com
+    depends_on:
+      - nginx-proxy
+    networks:
+      - nginx-proxy
+
+volumes:
+  certs:
+  vhost.d:
+  html:
+
+networks:
+  nginx-proxy:
+    external: false

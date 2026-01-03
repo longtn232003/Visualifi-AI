@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/production/Dockerfile.production
+    container_name: visualifyai-app-local
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=localhost,127.0.0.1
+    expose:
+      - '80'
+    networks:
+      - nginx-proxy-local
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy-local
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DEFAULT_HOST=localhost
+    depends_on:
+      - app
+    networks:
+      - nginx-proxy-local
+
+networks:
+  nginx-proxy-local:
+    external: false

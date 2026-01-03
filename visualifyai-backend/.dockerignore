@@ -1,0 +1,51 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# IDE
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project
+
+# Build
+dist
+build
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Uploads (will be mounted through volume)
+uploads/*
+
+# Cache
+.npm
+.eslintcache
+.cursor
+
+# Other unnecessary files
+README.md
+LICENSE
+tests
+test
+.prettierrc
+.eslintrc
+documentation 
